@@ -25,7 +25,7 @@ class TestAdd:
     def test_add_different_operands_and_destination_is_not_operand(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
-            cpu.i_mem: {0 : 0x012A4020}
+            cpu.i_mem: {0: 0x012A4020}
         }
 
         go = cpu.Simulation(
@@ -58,7 +58,7 @@ class TestAnd:
     def test_and_different_operands_and_destination_is_not_operand(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
-            cpu.i_mem: {0 : 0x012A4024}
+            cpu.i_mem: {0: 0x012A4024}
         }
 
         go = cpu.Simulation(
@@ -76,7 +76,7 @@ class TestAddI:
     def test_addi_different_operand_and_destination(self):
         memory = {
             cpu.rf:    {t1: 7},
-            cpu.i_mem: {0 : 0x21280005}
+            cpu.i_mem: {0: 0x21280005}
         }
 
         go = cpu.Simulation(
@@ -91,7 +91,7 @@ class TestAddI:
     def test_addi_different_operand_and_destination_with_arithmetic_extension(self):
         memory = {
             cpu.rf:    {t1: 7},
-            cpu.i_mem: {0 : 0x2128FFFB}
+            cpu.i_mem: {0: 0x2128FFFB}
         }
 
         go = cpu.Simulation(
