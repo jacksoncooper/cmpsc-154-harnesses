@@ -150,3 +150,21 @@ class TestLoadUpperImmediate:
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0x12340000})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+### ORI ###
+
+class TestOrImmediate:
+    def test_ori_different_operand_and_destination(self):
+        memory = {
+            cpu.rf:    {t1: 0x11111},
+            cpu.i_mem: {0: 0x21280202}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0x11313, t1: 0x11111})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
