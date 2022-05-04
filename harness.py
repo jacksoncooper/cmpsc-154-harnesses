@@ -168,3 +168,39 @@ class TestOrImmediate:
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0x11313, t1: 0x11111})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+### SLT ###
+
+class TestSetOnLessThan:
+    def test_slt_with_positive_second_operand_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 5, t2: 7},
+            cpu.i_mem: {0: 0x012A402A}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 1, t1: 5, t2: 7})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+### LW ###
+
+class TestLoadWord:
+    # TODO
+    pass
+
+### SW ###
+
+class TestStoreWord:
+    # TODO
+    pass
+
+### BEQ ###
+
+class TestBranchOnEqual:
+    # TODO
+    pass
