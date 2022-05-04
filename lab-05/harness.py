@@ -1,4 +1,7 @@
 import pytest
+
+import pyrtl as rtl
+
 import cpu
 
 t0, t1, t2 = 8, 9, 10
@@ -28,7 +31,7 @@ class TestAdd:
             cpu.i_mem: {0: 0x012A4020}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -43,7 +46,7 @@ class TestAdd:
             cpu.i_mem: {0: 0x012A4020}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -58,7 +61,7 @@ class TestAdd:
             cpu.i_mem: {0: 0x012A0020}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -76,7 +79,7 @@ class TestAnd:
             cpu.i_mem: {0: 0x012A4024}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -94,7 +97,7 @@ class TestAddImmediate:
             cpu.i_mem: {0: 0x21280005}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -109,7 +112,7 @@ class TestAddImmediate:
             cpu.i_mem: {0: 0x2128FFFB}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -124,7 +127,7 @@ class TestAddImmediate:
             cpu.i_mem: {0: 0x21200005}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -142,7 +145,7 @@ class TestLoadUpperImmediate:
             cpu.i_mem: {0: 0x3C081234}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -160,7 +163,7 @@ class TestOrImmediate:
             cpu.i_mem: {0: 0x21280202}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -178,7 +181,7 @@ class TestSetOnLessThan:
             cpu.i_mem: {0: 0x012A402A}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -193,7 +196,7 @@ class TestSetOnLessThan:
             cpu.i_mem: {0: 0x012A402A}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -211,7 +214,7 @@ class TestSetOnLessThan:
     #         cpu.i_mem: {0: 0x012A402A}
     #     }
 
-    #     go = cpu.Simulation(
+    #     go = rtl.Simulation(
     #         register_value_map = {cpu.pc: 0},
     #         memory_value_map = memory
     #     )
@@ -230,7 +233,7 @@ class TestLoadWord:
             cpu.i_mem: {0: 0x8D280004}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -246,7 +249,7 @@ class TestLoadWord:
             cpu.i_mem: {0: 0x8D28FFFC}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -264,7 +267,7 @@ class TestStoreWord:
             cpu.i_mem: {0: 0xAD28FFFC}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 0},
             memory_value_map = memory
         )
@@ -282,7 +285,7 @@ class TestBranchOnEqual:
             cpu.i_mem: {0: 0x1109FFFC}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 3},
             memory_value_map = memory
         )
@@ -299,7 +302,7 @@ class TestBranchOnEqual:
             cpu.i_mem: {0: 0x1109FFFC}
         }
 
-        go = cpu.Simulation(
+        go = rtl.Simulation(
             register_value_map = {cpu.pc: 3},
             memory_value_map = memory
         )
