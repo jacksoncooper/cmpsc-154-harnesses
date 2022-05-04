@@ -52,6 +52,21 @@ class TestAdd:
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0, t1: 0x80000000, t2: 0x80000000})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
+    def test_add_does_not_clobber_zero_register(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {0: 0x012A0020}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
 ### AND ###
 
 class TestAnd:
@@ -101,4 +116,19 @@ class TestAddI:
         
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t0: 2, t1: 7})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    def test_addi_does_not_clobber_zero_register(self):
+        memory = {
+            cpu.rf:    {t1: 7},
+            cpu.i_mem: {0: 0x21200005}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
