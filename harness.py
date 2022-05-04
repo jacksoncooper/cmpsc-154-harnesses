@@ -172,7 +172,7 @@ class TestOrImmediate:
 ### SLT ###
 
 class TestSetOnLessThan:
-    def test_slt_with_positive_second_operand_and_destination_is_not_operand(self):
+    def test_slt_with_positive_larger_second_operand_and_destination_is_not_operand(self):
         memory = {
             cpu.rf:    {t1: 5, t2: 7},
             cpu.i_mem: {0: 0x012A402A}
@@ -186,6 +186,24 @@ class TestSetOnLessThan:
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t0: 1, t1: 5, t2: 7})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    def test_slt_with_positive_smaller_second_operand_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {0: 0x012A402A}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0, t1: 7, t2: 5})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    # TODO: Can't get negative operands working.
+    # https://piazza.com/class/l18i7acdkcy3un?cid=101
 
 ### LW ###
 
