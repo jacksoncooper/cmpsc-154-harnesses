@@ -223,8 +223,37 @@ class TestSetOnLessThan:
 ### LW ###
 
 class TestLoadWord:
-    # TODO
-    pass
+    def test_lw_with_positive_offset_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 6},
+            cpu.d_mem: {10: 0xabcdeeee},
+            cpu.i_mem: {0: 0x8D280004}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0xabcdeeee, t1: 6})
+        expect_memory(go.inspect_mem(cpu.d_mem), {10: 0xabcdeeee})
+
+    def test_lw_with_negative_offset_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 6},
+            cpu.d_mem: {2: 0xabcdeeee},
+            cpu.i_mem: {0: 0x8D28fffC}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0xabcdeeee, t1: 6})
+        expect_memory(go.inspect_mem(cpu.d_mem), {2: 0xabcdeeee})
 
 ### SW ###
 
