@@ -87,7 +87,7 @@ class TestAnd:
 
 ### ADDI ###
 
-class TestAddI:
+class TestAddImmediate:
     def test_addi_different_operand_and_destination(self):
         memory = {
             cpu.rf:    {t1: 7},
@@ -131,4 +131,22 @@ class TestAddI:
         
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+### LUI ###
+
+class TestLoadUpperImmediate:
+    def test_lui(self):
+        memory = {
+            cpu.rf:    {t0: 0xabcdeeee},
+            cpu.i_mem: {0: 0x3C081234}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0x12340000})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
