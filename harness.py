@@ -276,5 +276,36 @@ class TestStoreWord:
 ### BEQ ###
 
 class TestBranchOnEqual:
-    # TODO
-    pass
+    def test_beq_with_negative_offset_and_skipped_branch(self):
+        memory = {
+            cpu.rf:    {t0: 5, t1: 6},
+            cpu.i_mem: {0: 0x1109FFFC}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 3},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        go.step({})
+
+        assert go.inspect('pc') == 4
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 6})
+
+    def test_beq_with_negative_offset_and_taken_branch(self):
+        memory = {
+            cpu.rf:    {t0: 5, t1: 5},
+            cpu.i_mem: {0: 0x1109FFFC}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 3},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        go.step({})
+
+        assert go.inspect('pc') == 4
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
