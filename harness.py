@@ -202,6 +202,9 @@ class TestSetOnLessThan:
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0, t1: 7, t2: 5})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
+    # TODO: Can't get negative operands working.
+    # https://piazza.com/class/l18i7acdkcy3un?cid=101
+
     # def test_slt_with_negative_second_operand_and_destination_is_not_operand(self):
     #     memory = {
     #         cpu.rf:    {t1: 5, t2: -7},
@@ -216,9 +219,6 @@ class TestSetOnLessThan:
     #     go.step({})
     #     expect_memory(go.inspect_mem(cpu.rf), {t0: 0, t1: 5, t2: -7})
     #     expect_memory(go.inspect_mem(cpu.d_mem), {})
-
-    # TODO: Can't get negative operands working.
-    # https://piazza.com/class/l18i7acdkcy3un?cid=101
 
 ### LW ###
 
@@ -243,7 +243,7 @@ class TestLoadWord:
         memory = {
             cpu.rf:    {t1: 6},
             cpu.d_mem: {2: 0xabcdeeee},
-            cpu.i_mem: {0: 0x8D28fffC}
+            cpu.i_mem: {0: 0x8D28FFFC}
         }
 
         go = cpu.Simulation(
@@ -258,8 +258,20 @@ class TestLoadWord:
 ### SW ###
 
 class TestStoreWord:
-    # TODO
-    pass
+    def test_sw_with_negative_offset_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t0: 0xabcdeeee, t1: 6},
+            cpu.i_mem: {0: 0xAD28FFFC}
+        }
+
+        go = cpu.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0xabcdeeee, t1: 6})
+        expect_memory(go.inspect_mem(cpu.d_mem), {2: 0xabcdeeee})
 
 ### BEQ ###
 
