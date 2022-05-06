@@ -239,6 +239,35 @@ class TestSetOnLessThan:
         expect_memory(go.inspect_mem(cpu.rf), {t0: 1, t1: 0xffff_fff9, t2: 5})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
+    def test_slt_with_negative_larger_second_operand_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 0xffff_fff9, t2: 0xffff_fffb},
+            cpu.i_mem: {0: 0x012A402A}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 1, t1: 0xffff_fff9, t2: 0xffff_fffb})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    def test_slt_with_negative_smaller_second_operand_and_destination_is_not_operand(self):
+        memory = {
+            cpu.rf:    {t1: 0xffff_fffb, t2: 0xffff_fff9},
+            cpu.i_mem: {0: 0x012A402A}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0, t1: 0xffff_fffb, t2: 0xffff_fff9})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
 
 ### LW ###
 
