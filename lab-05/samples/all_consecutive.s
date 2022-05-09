@@ -11,8 +11,9 @@
 
 main:
     # add $a0, $zero, $zero        # For testing before loading to the CPU.
-    # add $a1, $zero, $zero        # 1.2.3.4/16
-
+    # add $a1, $zero, $zero        # 18.52.0.0/16
+                                   #   ^       ^
+                                   #  $a1     $a0
     # addi $a0, $a0, 16
 
     # lui $a1, 0x1234
