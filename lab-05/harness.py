@@ -4,7 +4,8 @@ import pyrtl as rtl
 
 import cpu
 
-t0, t1, t2 = 8, 9, 10
+
+v0, t0, t1, t2, t3, t4 = 2, 8, 9, 10, 11, 12
 
 def expect_memory(actual, expected):
     # The memory must have the same number of addresses with assigned values.
@@ -358,3 +359,37 @@ class TestBranchOnEqual:
 
         assert go.inspect('pc') == 4
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
+
+class TestConsecutiveInstructions:
+    def test_instructor_sample_test(self):
+        memory = {
+            cpu.rf: {},
+            cpu.i_mem: {0: 0x01004024, 1: 0x01204824, 2: 0x2129000a, 3: 0x11090006, 4: 0x01405024, 5: 0x8d4b0000, 6: 0x216b0001, 7: 0xad4b0000, 8: 0x21080001, 9: 0x1000fff9, 10: 0x8c020000, 11: 0x1042fffe}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 10, t1: 10, t2: 0, t3: 10, v0: 10})
+        expect_memory(go.inspect_mem(cpu.d_mem), {0: 10})
+    
+    def test_lui_program(self):
+        memory = {
+            cpu.rf: {},
+            cpu.i_mem: {0: 0x3C08000A, 1: 0x3C090001, 2: 0x2129FF38, 3: 0x01405024, 4: 0x01605824, 5: 0x200C0001, 6: 0x116C0003, 7: 0x01495020, 8: 0x010A582A, 9: 0x1000FFFC, 10: 0x1000FFFF}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 655360, t1: 65336, t2: 718696, t3: 1, t4: 1})
