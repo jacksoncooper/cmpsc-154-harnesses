@@ -1,11 +1,11 @@
-
+# Written by github.com/vChase42.
 
 .text
 
 main:
     lui $t0, 10             #t0 = 655360
     lui $t1, 1              #t1 = 65536
-    addi $t1, $t1, -200      #t1 = 65336
+    addi $t1, $t1, -200     #t1 = 65336
     and $t2, $t2, $zero     #t2 = 0
     and $t3, $t3, $zero     #t3 = 0
     addi $t4, $zero, 1      #t4 = 1
