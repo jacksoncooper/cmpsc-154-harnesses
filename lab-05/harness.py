@@ -348,6 +348,22 @@ class TestLoadWord:
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0xabcdeeee, t1: 6})
         expect_memory(go.inspect_mem(cpu.d_mem), {2: 0xabcdeeee})
 
+    def test_lw_does_not_clobber_zero_register(self):
+        memory = {
+            cpu.rf:    {t1: 6},
+            cpu.d_mem: {2: 0xabcdeeee},
+            cpu.i_mem: {0: 0x8D200FFC} # lw $zero, -4($t1)
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 6})
+        expect_memory(go.inspect_mem(cpu.d_mem), {2: 0xabcdeeee})
+
 ### SW ###
 
 class TestStoreWord:
