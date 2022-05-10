@@ -72,6 +72,21 @@ class TestAdd:
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
+    def test_add_same_operands_and_destination_is_operand(self):
+        memory = {
+            cpu.rf:    {t1: 7},
+            cpu.i_mem: {0: 0x01294820} # add $t1, $t1, $t1 
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 14})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
 ### AND ###
 
 class TestAnd:
@@ -88,6 +103,22 @@ class TestAnd:
         
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 7, t2: 5})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    def test_and_different_operands_and_destination_is_operand(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {0: 0x012A4824} # and $t1, $t1, $t2
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 5, t2: 5})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
 ### ADDI ###
@@ -136,6 +167,21 @@ class TestAddImmediate:
         
         go.step({})
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7})
+        expect_memory(go.inspect_mem(cpu.d_mem), {})
+
+    def test_addi_same_operand_and_destination(self):
+        memory = {
+            cpu.rf:    {t1: 7},
+            cpu.i_mem: {0: 0x21290005} # addi $t1, $t1, 5
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 12})
         expect_memory(go.inspect_mem(cpu.d_mem), {})
 
 ### LUI ###
