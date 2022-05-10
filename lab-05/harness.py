@@ -372,7 +372,24 @@ class TestBranchOnEqual:
     def test_beq_with_negative_offset_and_skipped_branch(self):
         memory = {
             cpu.rf:    {t0: 5, t1: 6},
-            cpu.i_mem: {0: 0x1109FFFC}
+            cpu.i_mem: {3: 0x1109FFFC}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 3},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        go.step({})
+
+        assert go.inspect('pc') == 4
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 6})
+
+    def test_beq_with_positive_offset_and_skipped_branch(self):
+        memory = {
+            cpu.rf:    {t0: 5, t1: 6},
+            cpu.i_mem: {3: 0x11090004}
         }
 
         go = rtl.Simulation(
@@ -389,7 +406,24 @@ class TestBranchOnEqual:
     def test_beq_with_negative_offset_and_taken_branch(self):
         memory = {
             cpu.rf:    {t0: 5, t1: 5},
-            cpu.i_mem: {0: 0x1109FFFC}
+            cpu.i_mem: {3: 0x1109FFFC}
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 3},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        go.step({}) # Required to write cpu.pc.next to $pc.
+
+        assert go.inspect('pc') == 0
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
+
+    def test_beq_with_positive_offset_and_taken_branch(self):
+        memory = {
+            cpu.rf:    {t0: 5, t1: 5},
+            cpu.i_mem: {3: 0x11090004}
         }
 
         go = rtl.Simulation(
@@ -400,7 +434,24 @@ class TestBranchOnEqual:
         go.step({})
         go.step({})
 
-        assert go.inspect('pc') == 4
+        assert go.inspect('pc') == 8
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
+
+    def test_beq_with_positive_offset_and_overflow(self):
+        memory = {
+            cpu.rf:    {t0: 5, t1: 5},
+            cpu.i_mem: {pow(2, 32) - 5: 0x11090007} # beq $t0, $t1, 7
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: pow(2, 32) - 5},
+            memory_value_map = memory
+        )
+        
+        go.step({})
+        go.step({})
+
+        assert go.inspect('pc') == 3
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
 
 ### Programs ###
