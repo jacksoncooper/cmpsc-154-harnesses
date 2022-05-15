@@ -196,3 +196,24 @@ class TestExecuteHazard:
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
+
+    def test_load_word_does_not_forward_from_execute_memory(self):
+        memory = {
+            cpu.rf:    {t1: 28},
+            cpu.d_mem: {28: 0xaabbccdd},
+            cpu.i_mem: {
+                1: 0x8D280000, # lw $t0, 0($t1)
+                2: 0x01094020, # add $t0, $t0, $t1
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 0xaabbccf9, t1: 28})
+
