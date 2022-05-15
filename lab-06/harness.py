@@ -31,8 +31,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A4020, # add $t0, $t1, $t2
-                8: 0x01095820, # add $t3, $t0, $t1
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x01095820, # add $t3, $t0, $t1
             }
         }
 
@@ -41,7 +41,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 19})
@@ -50,8 +50,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A4020, # add $t0, $t1, $t2
-                8: 0x01285820, # add $t3, $t1, $t0
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x01285820, # add $t3, $t1, $t0
             }
         }
 
@@ -60,7 +60,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 19})
@@ -69,8 +69,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A4020, # add $t0, $t1, $t2
-                8: 0x01085820, # add $t3, $t0, $t0
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x01085820, # add $t3, $t0, $t0
             }
         }
 
@@ -79,7 +79,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 24})
@@ -88,8 +88,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A0020, # add $zero, $t1, $t2
-                8: 0x00095820, # add $t3, $zero, $t1
+                1: 0x012A0020, # add $zero, $t1, $t2
+                2: 0x00095820, # add $t3, $zero, $t1
             }
         }
 
@@ -98,17 +98,17 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 7})
 
-    def test_type_one_a_hazard_with_forward_to_immediate(self):
+    def test_type_one_a_hazard_with_forward_to_type_immediate(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A4020, # add $t0, $t1, $t2
-                8: 0x210B0005, # addi $t3, $t0, 5
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x210B0005, # addi $t3, $t0, 5
             }
         }
 
@@ -117,7 +117,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 17})
@@ -126,8 +126,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
             cpu.i_mem: {
-                4: 0x012A0020, # add $zero, $t1, $t2
-                8: 0x200B0005, # addi $t3, $zero, 5
+                1: 0x012A0020, # add $zero, $t1, $t2
+                2: 0x200B0005, # addi $t3, $zero, 5
             }
         }
 
@@ -136,7 +136,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 5})
@@ -145,8 +145,8 @@ class TestExecuteHazard:
         memory = {
             cpu.rf:    {t1: 4, t2: 7},
             cpu.i_mem: {
-                8: 0xAC090000, # sw $t1, 0($t1)
-                4: 0x012A4020, # add $t0, $t1, $t2
+                1: 0xAC090000, # sw $t1, 0($t1)
+                2: 0x012A4020, # add $t0, $t1, $t2
             }
         }
 
@@ -155,7 +155,7 @@ class TestExecuteHazard:
             memory_value_map = memory
         )
         
-        for cycle in range(12):
+        for cycle in range(7):
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 11, t1: 4, t2: 7})
