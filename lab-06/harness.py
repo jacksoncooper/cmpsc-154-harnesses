@@ -143,9 +143,10 @@ class TestExecuteHazard:
 
     def test_do_not_forward_without_register_write(self):
         memory = {
-            cpu.rf:    {t1: 4, t2: 7},
+            #                      v d_mem is word addressable, okay.
+            cpu.rf:    {t0: 9, t1: 7, t2: 5},
             cpu.i_mem: {
-                1: 0xAC090000, # sw $t1, 0($t1)
+                1: 0xAD280000, # sw $t0, 0($t1)
                 2: 0x012A4020, # add $t0, $t1, $t2
             }
         }
@@ -158,4 +159,4 @@ class TestExecuteHazard:
         for cycle in range(7):
             go.step({})
 
-        expect_memory(go.inspect_mem(cpu.rf), {t0: 11, t1: 4, t2: 7})
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5})
