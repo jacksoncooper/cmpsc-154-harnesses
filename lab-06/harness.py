@@ -25,6 +25,8 @@ def expect_memory(actual, expected):
     #     assert not actual[address]
 
 class TestExecuteHazard:
+    # TODO: Different permutations of the destination register? Type R and Type I.
+
     def test_type_one_a_hazard(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
@@ -100,3 +102,60 @@ class TestExecuteHazard:
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 7})
+
+    def test_type_one_a_hazard_with_forward_to_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                4: 0x012A4020, # add $t0, $t1, $t2
+                8: 0x210B0005, # addi $t3, $t0, 5
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(12):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 17})
+
+    def test_type_one_a_hazard_with_zero_forward_and_forward_to_type_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                4: 0x012A0020, # add $zero, $t1, $t2
+                8: 0x200B0005, # addi $t3, $zero, 5
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(12):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 5})
+
+    def test_do_not_forward_without_register_write(self):
+        memory = {
+            cpu.rf:    {t1: 4, t2: 7},
+            cpu.i_mem: {
+                8: 0xAC090000, # sw $t1, 0($t1)
+                4: 0x012A4020, # add $t0, $t1, $t2
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(12):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 11, t1: 4, t2: 7})
