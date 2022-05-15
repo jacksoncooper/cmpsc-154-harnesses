@@ -25,8 +25,6 @@ def expect_memory(actual, expected):
     #     assert not actual[address]
 
 class TestExecuteHazard:
-    # TODO: Different permutations of the destination register? Type R and Type I.
-
     def test_type_one_a_hazard(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
@@ -160,3 +158,41 @@ class TestExecuteHazard:
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5})
+
+    def test_type_one_a_hazard_with_forward_from_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 5},
+            cpu.i_mem: {
+                1: 0x34080007, # ori $t0, $zero, 7
+                2: 0x01094020, # add $t0, $t0, $t1
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 5})
+
+    def test_type_one_a_hazard_with_zero_forward_and_forward_from_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 5},
+            cpu.i_mem: {
+                1: 0x34000007, # ori $zero, $zero, 7
+                2: 0x00094020, # add $t0, $zero, $t1
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
