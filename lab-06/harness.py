@@ -217,3 +217,45 @@ class TestExecuteHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0xaabbccf9, t1: 28})
 
+    def test_forward_from_immediate_does_not_clobber_immediate(self):
+        # Trying to test if the immediate multiplexer is in the right place.
+
+        memory = {
+            cpu.rf:    {t1: 6},
+            cpu.i_mem: {
+                1: 0x35280001, # ori $t0, $t1, 1
+                2: 0x20080009, # addi $t0, $zero, 9
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 9, t1: 6})
+
+class TestMemoryHazard:
+    def test_type_two_a_hazard(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x012A4024, # and $t0, $t1, $t2
+                2: 0x00000020, # no-op: add $zero $zero $zero
+                3: 0x01005820, # add $t3, $t0, $zero
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 7, t2: 5, t3: 5})
+
