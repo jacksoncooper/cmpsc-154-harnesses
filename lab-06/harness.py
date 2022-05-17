@@ -159,8 +159,8 @@ class TestExecuteHazard:
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 5})
 
     def test_do_not_forward_without_register_write(self):
-        # Not sure how to test, because SW and BEQ do not change their
-        # operands, and so forwarding from `rs` and `rt` is benign.
+        # Not sure how to test, because SW and BEQ do not change their operands,
+        # and so forwarding from `rs` and `rt` is benign.
         pass
 
     def test_type_one_a_hazard_with_forward_from_immediate(self):
@@ -383,6 +383,6 @@ class TestMemoryHazard:
         expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 21})
 
     def test_do_not_forward_without_register_write(self):
-        # Not sure how to test, because SW and BEQ do not change their
-        # operands, and so forwarding from `rs` and `rt` is benign.
+        # Not sure how to test, because SW and BEQ do not change their operands,
+        # and so forwarding from `rs` and `rt` is benign.
         pass
