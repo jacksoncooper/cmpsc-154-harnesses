@@ -386,3 +386,24 @@ class TestMemoryHazard:
         # Not sure how to test, because SW and BEQ do not change their operands,
         # and so forwarding from `rs` and `rt` is benign.
         pass
+
+    def test_forward_from_execute_memory_takes_priority(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x01094020, # add $t0, $t0, $t1
+                3: 0x01094020, # add $t0, $t0, $t1
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 26, t1: 7, t2: 5})
+
