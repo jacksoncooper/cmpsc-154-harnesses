@@ -101,6 +101,25 @@ class TestExecuteHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 7})
 
+    def test_type_one_b_hazard_with_zero_forward(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x01205820, # add $zero, $t1, $t2
+                2: 0x00095820, # add $t3, $t1, $zero
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 7})
+
     def test_type_one_a_hazard_with_forward_to_type_immediate(self):
         memory = {
             cpu.rf:    {t1: 7, t2: 5},
@@ -140,24 +159,9 @@ class TestExecuteHazard:
         expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 5})
 
     def test_do_not_forward_without_register_write(self):
-        memory = {
-            #                      v d_mem is word addressable, okay.
-            cpu.rf:    {t0: 9, t1: 7, t2: 5},
-            cpu.i_mem: {
-                1: 0xAD280000, # sw $t0, 0($t1)
-                2: 0x012A4020, # add $t0, $t1, $t2
-            }
-        }
-
-        go = rtl.Simulation(
-            register_value_map = {cpu.pc: 0},
-            memory_value_map = memory
-        )
-        
-        for cycle in range(7):
-            go.step({})
-
-        expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5})
+        # Not sure how to test, because SW and BEQ do not change their
+        # operands, and so forwarding from `rs` and `rt` is benign.
+        pass
 
     def test_type_one_a_hazard_with_forward_from_immediate(self):
         memory = {
@@ -197,6 +201,25 @@ class TestExecuteHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 5})
 
+    def test_type_one_a_hazard_with_forward_to_immediate_and_forward_from_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 5},
+            cpu.i_mem: {
+                1: 0x35280008, # ori $t0, $t1, 8
+                2: 0x21080000, # addi $t0, $t0, 0
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 13, t1: 5})
+
     def test_load_word_does_not_forward_from_execute_memory(self):
         memory = {
             cpu.rf:    {t1: 28},
@@ -217,7 +240,7 @@ class TestExecuteHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 0xaabbccf9, t1: 28})
 
-    def test_forward_from_immediate_does_not_clobber_immediate(self):
+    def test_forward_does_not_clobber_immediate(self):
         # Trying to test if the immediate multiplexer is in the right place.
 
         memory = {
@@ -299,3 +322,67 @@ class TestMemoryHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 5, t1: 7, t2: 5, t3: 10})
 
+    def test_type_two_a_hazard_with_zero_forward(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x012A0024, # and $zero, $t1, $t2
+                2: 0x00000020, # no-op: add $zero $zero $zero
+                3: 0x00085820, # add $t3, $zero, $t0
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 0})
+
+    def test_type_two_b_hazard_with_zero_forward(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x012A0024, # and $zero, $t1, $t2
+                2: 0x00000020, # no-op: add $zero $zero $zero
+                3: 0x01005820, # add $t3, $t0, $zero
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t1: 7, t2: 5, t3: 0})
+
+    def test_type_two_a_hazard_with_forward_to_immediate(self):
+        memory = {
+            cpu.rf:    {t1: 7, t2: 5},
+            cpu.i_mem: {
+                1: 0x012A4020, # add $t0, $t1, $t2
+                2: 0x00000020, # no-op: add $zero $zero $zero
+                3: 0x210B0009, # addi $t3, $t0, 9
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 12, t1: 7, t2: 5, t3: 21})
+
+    def test_do_not_forward_without_register_write(self):
+        # Not sure how to test, because SW and BEQ do not change their
+        # operands, and so forwarding from `rs` and `rt` is benign.
+        pass
