@@ -409,7 +409,7 @@ class TestMemoryHazard:
 
     def test_type_one_a_hazard_and_two_b_hazard(self):
         memory = {
-                cpu.rf:    {t3: 9, t4: 7},
+            cpu.rf:    {t3: 9, t4: 7},
             cpu.i_mem: {
                 1: 0x000B4020, # add $t0, $zero, $t3
                 2: 0x000C4820, # add $t1, $zero, $t4
@@ -429,7 +429,7 @@ class TestMemoryHazard:
 
     def test_type_one_b_hazard_and_two_a_hazard(self):
         memory = {
-                cpu.rf:    {t3: 9, t4: 7},
+            cpu.rf:    {t3: 9, t4: 7},
             cpu.i_mem: {
                 1: 0x000B4020, # add $t0, $zero, $t3
                 2: 0x000C4820, # add $t1, $zero, $t4
@@ -446,3 +446,24 @@ class TestMemoryHazard:
             go.step({})
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 9, t1: 7, t2: 16, t3: 9, t4: 7})
+
+    def test_load_stall_and_type_two_a_hazard(self):
+        memory = {
+            cpu.rf:    {t0: 48, t3: 8},
+            cpu.d_mem: {48: 42},
+            cpu.i_mem: {
+                1: 0x8D090000, # lw $t1, 0($t0)
+                2: 0x012B5020, # add $t2, $t1, $t3
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(7):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 48, t1: 42, t2: 50, t3: 8})
+
