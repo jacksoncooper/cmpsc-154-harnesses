@@ -467,3 +467,105 @@ class TestMemoryHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 48, t1: 42, t2: 50, t3: 8})
 
+class TestConsecutiveInstructions:
+    def test_instructor_sample_test(self):
+        memory = {
+            cpu.i_mem: {
+                0: 0x01004024, 1: 0x01204824, 2: 0x2129000a, 3: 0x11090006,
+                4: 0x01405024, 5: 0x8d4b0000, 6: 0x216b0001, 7: 0xad4b0000,
+                8: 0x21080001, 9: 0x1000fff9, 10: 0x8c020000, 11: 0x1042fffe
+            }
+        }
+
+        go = rtl.Simulation(
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 10, t1: 10, t2: 0, t3: 10, v0: 10})
+        expect_memory(go.inspect_mem(cpu.d_mem), {0: 10})
+    
+    def test_lui_program(self):
+        memory = {
+            cpu.i_mem: {
+                0: 0x3C08000A, 1: 0x3C090001, 2: 0x2129FF38, 3: 0x01405024,
+                4: 0x01605824, 5: 0x200C0001, 6: 0x116C0003, 7: 0x01495020,
+                8: 0x010A582A, 9: 0x1000FFFC, 10: 0x1000FFFF
+            }
+        }
+
+        go = rtl.Simulation(
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 655360, t1: 65336, t2: 718696, t3: 1, t4: 1})
+
+    def test_all_consecutive_with_bad_host(self):
+        memory = {
+            cpu.rf: {a3: 1024},
+            cpu.d_mem: {1024: 16, 1028: 0x1234002b},
+            cpu.i_mem: {
+                0: 0x8ce80000, 1: 0x21080001, 2: 0x01204820, 3: 0x00005020,
+                4: 0x200b0020, 5: 0x00006020, 6: 0x218c0001, 7: 0x0168502a,
+                8: 0x114c0004, 9: 0x01294820, 10: 0x21290001, 11: 0x21080001,
+                12: 0x1000fffa, 13: 0x8ced0004, 14: 0x012d7024, 15: 0x21ef002a,
+                16: 0x11cf0001, 17: 0x10000004, 18: 0x00004020, 19: 0x3c086f79,
+                20: 0x35086573, 21: 0x10000003, 22: 0x00004020, 23: 0x3c086f68,
+                24: 0x35086e6f, 25: 0xace80008, 26: 0x1000ffff
+            }
+        }
+
+        go = rtl.Simulation(
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {
+            t0: 0x6f686e6f, t1: 0x0000ffff, t2: 1, t3: 32, t4: 1,
+            t5: 0x1234002b, t6: 43, t7: 42,
+            a3: 1024
+        })
+
+        expect_memory(go.inspect_mem(cpu.d_mem), {
+            1024: 16, 1028: 0x1234002b, 1032: 0x6f686e6f
+        })
+
+    def test_all_consecutive_with_good_host(self):
+        memory = {
+            cpu.rf: {a3: 1024},
+            cpu.d_mem: {1024: 16, 1028: 0x1234002a},
+            cpu.i_mem: {
+                0: 0x8ce80000, 1: 0x21080001, 2: 0x01204820, 3: 0x00005020,
+                4: 0x200b0020, 5: 0x00006020, 6: 0x218c0001, 7: 0x0168502a,
+                8: 0x114c0004, 9: 0x01294820, 10: 0x21290001, 11: 0x21080001,
+                12: 0x1000fffa, 13: 0x8ced0004, 14: 0x012d7024, 15: 0x21ef002a,
+                16: 0x11cf0001, 17: 0x10000004, 18: 0x00004020, 19: 0x3c086f79,
+                20: 0x35086573, 21: 0x10000003, 22: 0x00004020, 23: 0x3c086f68,
+                24: 0x35086e6f, 25: 0xace80008, 26: 0x1000ffff
+            }
+        }
+
+        go = rtl.Simulation(
+            memory_value_map = memory
+        )
+
+        for i in range(500):
+            go.step({})
+        
+        expect_memory(go.inspect_mem(cpu.rf), {
+            t0: 0x6f796573, t1: 0x0000ffff, t2: 1, t3: 32, t4: 1,
+            t5: 0x1234002a, t6: 42, t7: 42,
+            a3: 1024
+        })
+
+        expect_memory(go.inspect_mem(cpu.d_mem), {
+            1024: 16, 1028: 0x1234002a, 1032: 0x6f796573
+        })
+
