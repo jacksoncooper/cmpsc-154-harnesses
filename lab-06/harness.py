@@ -407,3 +407,42 @@ class TestMemoryHazard:
 
         expect_memory(go.inspect_mem(cpu.rf), {t0: 26, t1: 7, t2: 5})
 
+    def test_type_one_a_hazard_and_two_b_hazard(self):
+        memory = {
+                cpu.rf:    {t3: 9, t4: 7},
+            cpu.i_mem: {
+                1: 0x000B4020, # add $t0, $zero, $t3
+                2: 0x000C4820, # add $t1, $zero, $t4
+                3: 0x01285020, # add $t2, $t1, $t0
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 9, t1: 7, t2: 16, t3: 9, t4: 7})
+
+    def test_type_one_b_hazard_and_two_a_hazard(self):
+        memory = {
+                cpu.rf:    {t3: 9, t4: 7},
+            cpu.i_mem: {
+                1: 0x000B4020, # add $t0, $zero, $t3
+                2: 0x000C4820, # add $t1, $zero, $t4
+                3: 0x01095020, # add $t2, $t0, $t1
+            }
+        }
+
+        go = rtl.Simulation(
+            register_value_map = {cpu.pc: 0},
+            memory_value_map = memory
+        )
+        
+        for cycle in range(8):
+            go.step({})
+
+        expect_memory(go.inspect_mem(cpu.rf), {t0: 9, t1: 7, t2: 16, t3: 9, t4: 7})
