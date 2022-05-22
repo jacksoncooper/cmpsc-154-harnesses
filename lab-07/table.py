@@ -175,3 +175,34 @@ class TestIsolatedPredictor:
         }))
         assert go.inspect('pred_taken') == 0
 
+class TestParallelPredictors:
+    def test_predictors_have_separate_state(self):
+        go = rtl.Simulation()
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.fetch_pc: 4,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+            table.update_branch_pc: 0
+        })
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.fetch_pc: 4,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+            table.update_branch_pc: 0
+        })
+        assert go.inspect('pred_taken') == 1
+
+        go.step({
+            table.fetch_pc: 12,
+            table.update_prediction: 1,
+            table.update_branch_taken: 0,
+            table.update_branch_pc: 0
+        })
+        assert go.inspect('pred_taken') == 0
+
+        assert go.inspect_mem(table.pred_state) == {0b001: 0b10, 0b011: 0b00}
