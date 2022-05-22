@@ -2,14 +2,14 @@ import pytest
 
 import pyrtl as rtl
 
-import ucsbcs154_lab7_2bitpred as pred
+import ucsbcs154_lab7_predtable as table
 
 def vestigial_state(inputs):
-    inputs[pred.fetch_pc] = 0
-    inputs[pred.update_branch_pc] = 0
+    inputs[table.fetch_pc] = 0
+    inputs[table.update_branch_pc] = 0
     return inputs
 
-class TestAutomata:
+class TestIsolatedPredictor:
     def test_starts_predicting_not_taken(self):
         go = rtl.Simulation()
         assert go.inspect('pred_taken') == 0
@@ -20,20 +20,20 @@ class TestAutomata:
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 1
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 1
 
@@ -41,20 +41,20 @@ class TestAutomata:
 
         for _ in range(16):
             go.step(vestigial_state({
-                pred.update_prediction: 1,
-                pred.update_branch_taken: 1
+                table.update_prediction: 1,
+                table.update_branch_taken: 1
             }))
             assert go.inspect('pred_taken') == 1
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 1
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 0
 
@@ -64,40 +64,40 @@ class TestAutomata:
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 1
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 1
 
         # Should be in the confident taken state.
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 1
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 0
 
@@ -105,20 +105,20 @@ class TestAutomata:
 
         for _ in range(16):
             go.step(vestigial_state({
-                pred.update_prediction: 1,
-                pred.update_branch_taken: 0
+                table.update_prediction: 1,
+                table.update_branch_taken: 0
             }))
             assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 1
 
@@ -128,21 +128,21 @@ class TestAutomata:
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         for _ in range(16):
             go.step(vestigial_state({
-                pred.update_prediction: 1,
-                pred.update_branch_taken: 1
+                table.update_prediction: 1,
+                table.update_branch_taken: 1
             }))
             assert go.inspect('pred_taken') == 1
 
             go.step(vestigial_state({
-                pred.update_prediction: 1,
-                pred.update_branch_taken: 0
+                table.update_prediction: 1,
+                table.update_branch_taken: 0
             }))
             assert go.inspect('pred_taken') == 0
 
@@ -152,26 +152,26 @@ class TestAutomata:
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 1
+            table.update_prediction: 1,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 0,
-            pred.update_branch_taken: 1
+            table.update_prediction: 0,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 0,
-            pred.update_branch_taken: 1
+            table.update_prediction: 0,
+            table.update_branch_taken: 1
         }))
         assert go.inspect('pred_taken') == 0
 
         go.step(vestigial_state({
-            pred.update_prediction: 1,
-            pred.update_branch_taken: 0
+            table.update_prediction: 1,
+            table.update_branch_taken: 0
         }))
         assert go.inspect('pred_taken') == 0
 
