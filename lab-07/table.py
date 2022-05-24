@@ -182,26 +182,26 @@ class TestParallelPredictors:
         assert go.inspect('pred_taken') == 0
 
         go.step({
+            table.update_branch_pc: 4,
             table.fetch_pc: 4,
             table.update_prediction: 1,
             table.update_branch_taken: 1,
-            table.update_branch_pc: 0
         })
         assert go.inspect('pred_taken') == 0
 
         go.step({
+            table.update_branch_pc: 4,
             table.fetch_pc: 4,
             table.update_prediction: 1,
             table.update_branch_taken: 1,
-            table.update_branch_pc: 0
         })
         assert go.inspect('pred_taken') == 1
 
         go.step({
+            table.update_branch_pc: 12,
             table.fetch_pc: 12,
             table.update_prediction: 1,
             table.update_branch_taken: 0,
-            table.update_branch_pc: 0
         })
         assert go.inspect('pred_taken') == 0
 
