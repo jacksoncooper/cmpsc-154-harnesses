@@ -177,6 +177,11 @@ class TestIsolatedPredictor:
 
 class TestParallelPredictors:
     def test_predictors_have_separate_state(self):
+        # I didn't release these tests like the two prior labs because this
+        # test relies on an odd bit of implementation that will never happen
+        # outside of our simulation; an instruction cannot immediately follow
+        # itself. If you're failing this one, don't worry about it.
+
         go = rtl.Simulation()
 
         assert go.inspect('pred_taken') == 0
