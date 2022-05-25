@@ -205,4 +205,25 @@ class TestParallelPredictors:
         })
         assert go.inspect('pred_taken') == 0
 
-        assert go.inspect_mem(table.pred_state) == {0b001: 0b10, 0b011: 0b00}
+    def test_state_bypass_when_colliding_predictor_addresses(self):
+        go = rtl.Simulation()
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.update_branch_pc: 12,
+            table.fetch_pc: 36,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+        })
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.update_branch_pc: 44,
+            table.fetch_pc: 76,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+        })
+
+        assert go.inspect('pred_taken') == 1
