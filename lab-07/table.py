@@ -227,3 +227,35 @@ class TestParallelPredictors:
         })
 
         assert go.inspect('pred_taken') == 1
+
+    def test_simple_prediction(self):
+        go = rtl.Simulation()
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.update_branch_pc: 4,
+            table.fetch_pc: 0,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+        })
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.update_branch_pc: 36,
+            table.fetch_pc: 0,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+        })
+
+        assert go.inspect('pred_taken') == 0
+
+        go.step({
+            table.update_branch_pc: 0,
+            table.fetch_pc: 68,
+            table.update_prediction: 1,
+            table.update_branch_taken: 1,
+        })
+
+        assert go.inspect('pred_taken') == 1
